@@ -1,0 +1,252 @@
+<Window x:Class="Maestro.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="clr-namespace:Maestro.Views"
+        Title="Maestro" Icon="pack://application:,,,/Assets/maestro.ico"
+        Width="920" Height="700" MinWidth="520" MinHeight="460"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource ShellBrush}"
+        UseLayoutRounding="True" TextOptions.TextFormattingMode="Ideal">
+
+    <Window.Resources>
+        <Style x:Key="ResultBox" TargetType="Border">
+            <Setter Property="Width" Value="230"/>
+            <Setter Property="Margin" Value="0,0,12,12"/>
+            <Setter Property="Padding" Value="16,14"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Background" Value="#0DFFFFFF"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Hairline}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="28,22,20,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Margin="0,0,8,18">
+            <StackPanel>
+                <TextBlock Text="MAESTRO" FontFamily="{StaticResource Display}" FontSize="20" Foreground="{StaticResource Ink}"/>
+                <TextBlock Text="{v:T subtitle}" Style="{StaticResource Body}" Foreground="{StaticResource Muted}" Margin="0,7,0,0"/>
+            </StackPanel>
+            <TextBlock Text="{Binding Headline}" Style="{StaticResource Body}" Foreground="{StaticResource Accent}"
+                       HorizontalAlignment="Right" VerticalAlignment="Top" Margin="160,4,0,0" TextAlignment="Right"/>
+        </Grid>
+
+        <Grid x:Name="Body" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="NavColumn" Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="NavRow" Height="0"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <WrapPanel x:Name="Nav" Grid.Row="1" Orientation="Vertical" Margin="0,0,14,0"
+                       KeyboardNavigation.TabNavigation="Once" KeyboardNavigation.DirectionalNavigation="Cycle">
+                <RadioButton x:Name="HomeTab" Content="{v:T navHome}" Style="{StaticResource NavItem}" IsChecked="True" Checked="OnNav" Tag="HomePage"/>
+                <RadioButton Content="{v:T navFps}" Style="{StaticResource NavItem}" Checked="OnNav" Tag="FpsPage"/>
+                <RadioButton Content="{v:T navGames}" Style="{StaticResource NavItem}" Checked="OnNav" Tag="GamesPage"/>
+                <RadioButton Content="{v:T navApps}" Style="{StaticResource NavItem}" Checked="OnNav" Tag="AppsPage"/>
+                <RadioButton Content="{v:T navGeneral}" Style="{StaticResource NavItem}" Checked="OnNav" Tag="GeneralPage"/>
+            </WrapPanel>
+
+            <ScrollViewer x:Name="Pages" Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0" Focusable="False">
+                <Grid>
+                    <StackPanel x:Name="HomePage">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="{v:T homeTitle}" Style="{StaticResource CardTitle}"/>
+                                <TextBlock Text="{Binding Headline}" Style="{StaticResource BigNumber}" FontSize="18" TextWrapping="Wrap" Margin="0,0,0,16"/>
+                                <ToggleButton Content="{v:T running}" Style="{StaticResource SwitchToggle}" IsChecked="{Binding Running}"/>
+                                <TextBlock Text="{v:T runningDesc}" Style="{StaticResource Note}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="{v:T historyTitle}" Style="{StaticResource CardTitle}"/>
+                                <TextBlock Text="{v:T historyEmpty}" Style="{StaticResource Body}" Foreground="{StaticResource Muted}"
+                                           Visibility="{Binding HasNoHistory, Converter={StaticResource Show}}"/>
+                                <ItemsControl ItemsSource="{Binding Recent}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Style="{StaticResource Body}" Margin="0,0,0,7"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="FpsPage" Visibility="Collapsed">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="{v:T permTitle}" Style="{StaticResource CardTitle}"/>
+                                <TextBlock Text="{Binding PermissionText}" Style="{StaticResource Body}"/>
+                                <Button Content="{v:T permGrant}" Style="{StaticResource ActionButton}" Command="{Binding GrantCommand}" HorizontalAlignment="Left"
+                                        Margin="0,14,0,0" Visibility="{Binding CanGrant, Converter={StaticResource Show}}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="{v:T fpsTitle}" Style="{StaticResource CardTitle}"/>
+                                <ToggleButton Content="{v:T showFps}" Style="{StaticResource SwitchToggle}" IsChecked="{Binding ShowFps}"/>
+                                <TextBlock Text="{v:T showFpsDesc}" Style="{StaticResource Note}"/>
+                                <TextBlock Text="{Binding FpsStatus}" Style="{StaticResource Status}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="{v:T compareTitle}" Style="{StaticResource CardTitle}"/>
+                                <TextBlock Text="{v:T compareDesc}" Style="{StaticResource Body}" Foreground="{StaticResource Muted}" Margin="0,0,0,14"/>
+                                <WrapPanel>
+                                    <StackPanel Margin="0,0,22,12">
+                                        <TextBlock Text="{v:T compareSeconds}" Style="{StaticResource Label}"/>
+                                        <ComboBox ItemsSource="{Binding Durations}" SelectedItem="{Binding Duration}" Style="{StaticResource FlatCombo}" Width="120"
+                                                  AutomationProperties.Name="{v:T compareSeconds}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding StringFormat={}{0} s}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </WrapPanel>
+                                <ToggleButton Content="{v:T simulateLoad}" Style="{StaticResource SwitchToggle}" IsChecked="{Binding SimulateLoad}"/>
+                                <TextBlock Text="{v:T simulateLoadDesc}" Style="{StaticResource Note}"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,4,0,12">
+                                    <Button Content="{v:T compareStart}" Style="{StaticResource ActionButton}" Command="{Binding CompareCommand}" Background="#337C8BFF" Margin="0,0,8,0"/>
+                                    <Button Content="{v:T compareCancel}" Style="{StaticResource GhostButton}" Command="{Binding CancelCompareCommand}"
+                                            Visibility="{Binding Comparing, Converter={StaticResource Show}}"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding Phase}" Style="{StaticResource Status}" Margin="0,0,0,12"/>
+                                <StackPanel Visibility="{Binding HasResult, Converter={StaticResource Show}}">
+                                    <WrapPanel>
+                                        <Border Style="{StaticResource ResultBox}">
+                                            <StackPanel>
+                                                <TextBlock Text="{v:T phaseWithout}" Style="{StaticResource Label}"/>
+                                                <TextBlock Text="{Binding WithoutAverage}" Style="{StaticResource BigNumber}"/>
+                                                <TextBlock Text="{v:T resultAvg}" Style="{StaticResource Label}"/>
+                                                <TextBlock Text="{Binding WithoutLow}" Style="{StaticResource Body}" FontSize="14"/>
+                                                <TextBlock Text="{v:T resultLow}" Style="{StaticResource Label}"/>
+                                                <TextBlock Text="{Binding WithoutWorst}" Style="{StaticResource Body}" FontSize="14"/>
+                                                <TextBlock Text="{v:T resultFrame}" Style="{StaticResource Label}" Margin="0"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource ResultBox}" BorderBrush="#667C8BFF">
+                                            <StackPanel>
+                                                <TextBlock Text="{v:T phaseWith}" Style="{StaticResource Label}" Foreground="{StaticResource Accent}"/>
+                                                <TextBlock Text="{Binding WithAverage}" Style="{StaticResource BigNumber}"/>
+                                                <TextBlock Text="{v:T resultAvg}" Style="{StaticResource Label}"/>
+                                                <TextBlock Text="{Binding WithLow}" Style="{StaticResource Body}" FontSize="14"/>
+                                                <TextBlock Text="{v:T resultLow}" Style="{StaticResource Label}"/>
+                                                <TextBlock Text="{Binding WithWorst}" Style="{StaticResource Body}" FontSize="14"/>
+                                                <TextBlock Text="{v:T resultFrame}" Style="{StaticResource Label}" Margin="0"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </WrapPanel>
+                                    <TextBlock Text="{Binding Delta}" Style="{StaticResource Body}" FontSize="13" Foreground="{StaticResource Good}" Margin="0,2,0,4"/>
+                                    <TextBlock Text="{v:T resultNote}" Style="{StaticResource Note}" Margin="0,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="{v:T previousTitle}" Style="{StaticResource CardTitle}"/>
+                                <ItemsControl ItemsSource="{Binding Previous}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Style="{StaticResource Body}" Margin="0,0,0,7"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="GamesPage" Visibility="Collapsed">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="{v:T gamesTitle}" Style="{StaticResource CardTitle}"/>
+                                <TextBlock Text="{v:T gamesDesc}" Style="{StaticResource Body}" Foreground="{StaticResource Muted}" Margin="0,0,0,16"/>
+                                <TextBlock Text="{v:T extraGames}" Style="{StaticResource Label}"/>
+                                <TextBox Text="{Binding ExtraGames}" Style="{StaticResource ListBox}" Margin="0,0,0,16" AutomationProperties.Name="{v:T extraGames}"/>
+                                <TextBlock Text="{v:T neverRestrain}" Style="{StaticResource Label}"/>
+                                <TextBox Text="{Binding NeverRestrain}" Style="{StaticResource ListBox}" Margin="0,0,0,16" AutomationProperties.Name="{v:T neverRestrain}"/>
+                                <TextBlock Text="{v:T slowDuringGames}" Style="{StaticResource Label}"/>
+                                <TextBox Text="{Binding SlowDuringGames}" Style="{StaticResource ListBox}" AutomationProperties.Name="{v:T slowDuringGames}"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="AppsPage" Visibility="Collapsed">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="MEDAL" Style="{StaticResource CardTitle}"/>
+                                <ToggleButton Content="{v:T medalManage}" Style="{StaticResource SwitchToggle}" IsChecked="{Binding MedalManage}" Margin="0,0,0,16"/>
+                                <TextBlock Text="{v:T medalPath}" Style="{StaticResource Label}"/>
+                                <TextBox Text="{Binding MedalPath}" Style="{StaticResource FlatBox}" Margin="0,0,0,14" AutomationProperties.Name="{v:T medalPath}"/>
+                                <TextBlock Text="{v:T medalClose}" Style="{StaticResource Label}"/>
+                                <TextBox Text="{Binding MedalCloseAfter}" Style="{StaticResource FlatBox}" Width="80" HorizontalAlignment="Left" AutomationProperties.Name="{v:T medalClose}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="QBITTORRENT" Style="{StaticResource CardTitle}"/>
+                                <TextBlock Text="{v:T qbitDesc}" Style="{StaticResource Body}" Foreground="{StaticResource Muted}" Margin="0,0,0,14"/>
+                                <TextBlock Text="{v:T qbitUrl}" Style="{StaticResource Label}"/>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding QbitUrl}" Style="{StaticResource FlatBox}" AutomationProperties.Name="{v:T qbitUrl}"/>
+                                    <Button Grid.Column="1" Content="{v:T qbitTest}" Style="{StaticResource ActionButton}" Command="{Binding TestQbitCommand}" Margin="8,0,0,0"/>
+                                </Grid>
+                                <TextBlock Text="{Binding QbitResult}" Style="{StaticResource Status}"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="GeneralPage" Visibility="Collapsed">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="{v:T generalTitle}" Style="{StaticResource CardTitle}"/>
+                                <TextBlock Text="{v:T language}" Style="{StaticResource Label}"/>
+                                <WrapPanel Margin="0,0,0,14">
+                                    <RadioButton Content="{v:T langAuto}" Style="{StaticResource NavItem}" GroupName="Language" IsChecked="{Binding LanguageAuto}"/>
+                                    <RadioButton Content="Português" Style="{StaticResource NavItem}" GroupName="Language" IsChecked="{Binding LanguagePortuguese}"/>
+                                    <RadioButton Content="English" Style="{StaticResource NavItem}" GroupName="Language" IsChecked="{Binding LanguageEnglish}"/>
+                                </WrapPanel>
+                                <ToggleButton Content="{v:T startWithWindows}" Style="{StaticResource SwitchToggle}" IsChecked="{Binding StartWithWindows}" Margin="0,0,0,14"/>
+                                <ToggleButton Content="{v:T checkUpdates}" Style="{StaticResource SwitchToggle}" IsChecked="{Binding CheckUpdates}"/>
+                                <TextBlock Text="{v:T checkUpdatesDesc}" Style="{StaticResource Note}"/>
+                                <TextBlock Text="{Binding VersionText}" Style="{StaticResource Body}" Margin="0,0,0,10"/>
+                                <Button Content="{Binding UpdateText}" Command="{Binding DownloadUpdateCommand}" HorizontalAlignment="Left"
+                                        Background="#337C8BFF" Margin="0,0,0,14">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource ActionButton}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding UpdateText}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                                <WrapPanel>
+                                    <Button Content="{v:T openConfig}" Style="{StaticResource ActionButton}" Command="{Binding OpenConfigCommand}" Margin="0,0,8,8"/>
+                                    <Button Content="{v:T openLogs}" Style="{StaticResource ActionButton}" Command="{Binding OpenLogsCommand}" Margin="0,0,8,8"/>
+                                    <Button Content="{v:T github}" Style="{StaticResource ActionButton}" Command="{Binding OpenRepositoryCommand}" Margin="0,0,8,8"/>
+                                </WrapPanel>
+                                <TextBlock Text="{v:T privacy}" Style="{StaticResource Note}" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>

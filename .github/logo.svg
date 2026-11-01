@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Maestro logo">
+  <defs>
+    <linearGradient id="face" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7C8BFF"/>
+      <stop offset="1" stop-color="#4A58D8"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="64" fill="url(#face)"/>
+  <g fill="#FFFFFF">
+    <rect x="35" y="99.5" width="26" height="57" rx="13"/>
+    <rect x="75" y="81.5" width="26" height="93" rx="13"/>
+    <rect x="115" y="63.5" width="26" height="129" rx="13"/>
+    <rect x="155" y="81.5" width="26" height="93" rx="13"/>
+    <rect x="195" y="99.5" width="26" height="57" rx="13"/>
+  </g>
+</svg>
